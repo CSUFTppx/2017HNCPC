@@ -13,17 +13,17 @@ import java.util.Map;
 public class Cache {
 
     private Map<String, List<Beacon>> beaconCache;
-    private static Cache cache;//单例模式
+    private static Cache INSTANCE;//单例模式
 
     private Cache() {
         beaconCache = new HashMap<>();
     }
 
-    public static Cache getCache() {
-        if (cache == null) {
-            cache = new Cache();
+    public static Cache getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new Cache();
         }
-        return cache;
+        return INSTANCE;
     }
 
     public void put(Beacon beacon) {
@@ -37,4 +37,16 @@ public class Cache {
         }
     }
 
+    public synchronized Map<String, List<Beacon>> copyCache() {
+        Map<String, List<Beacon>> copy = beaconCache;
+        beaconCache = new HashMap<>();
+        return copy;
+    }
+
+    public boolean isCacheEnough() {
+        if (beaconCache.size() >= 4) {
+            return true;
+        }
+        return false;
+    }
 }
