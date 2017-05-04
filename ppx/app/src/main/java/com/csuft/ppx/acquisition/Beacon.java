@@ -52,6 +52,8 @@ public class Beacon {
 
     public void setRssi(int rssi) {
         this.rssi = rssi;
+        //同时更新距离
+        setDistance(calculateAccuracy(this.measuredPower, this.rssi));
     }
 
     public int getTxPower() {
@@ -147,12 +149,12 @@ public class Beacon {
         return beacon;
     }
 
-    private  static double calculateAccuracy(int txPower, double rssi) {
+    private  static double calculateAccuracy(int measuredPower, double rssi) {
         if (rssi == 0) {
             return -1.0; // if we cannot determine accuracy, return -1.
         }
 
-        double ratio = rssi*1.0/txPower;
+        double ratio = rssi*1.0/measuredPower;
         if (ratio < 1.0) {
             return Math.pow(ratio,10);
         }

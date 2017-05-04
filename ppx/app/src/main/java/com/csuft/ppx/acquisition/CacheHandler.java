@@ -43,7 +43,7 @@ public class CacheHandler {
     //处理数据
     private void handlingData() {
         Map<String, List<Beacon>> cache = Cache.getInstance().copyCache();
-        if (cache.size() > 3) {
+        if (cache.size() <= 3) {
             Log.w(TAG, "handlingData: cache is not enough...", new NoSuchElementException());
             //在这里回调，返回lastPosition
         } else {
@@ -62,16 +62,66 @@ public class CacheHandler {
                     list.remove(0);
                     list.remove(list.size() - 1);
                     Beacon currentBeacon = list.get(0);
-                    
+                    Log.i(TAG, "handlingData: "+currentBeacon.getMac());
+                    currentBeacon.setRssi(hitCircle(list));
+                    lastPosition.add(currentBeacon);
                 } else {
-
+                    //数据较少，取最强的
+                    Beacon currentBeacon = list.get(0);
+                    lastPosition.add(currentBeacon);
                 }
             }
+            //在这里回调，返回lastPosition
+            Log.i(TAG, "handlingData: ***************华丽的分割线****************");
         }
     }
 
     private int hitCircle(List<Beacon> beaconList) {
+        int Max = 0;
+        int hit = 0;
+        for (int currentIndex = 0; currentIndex < beaconList.size(); currentIndex++) {
+            int startIndex = currentIndex;
+            int endIndex = currentIndex;
+            //左移遍历
+            for (int left = currentIndex; left > 0; left--) {
+                if (Math.abs(beaconList.get(currentIndex).getRssi() - beaconList.get(left).getRssi()) <= circle) {
+                    startIndex = left;
+                } else {
+                    break;
+                }
+            }
+            //右移遍历
+            for (int right = currentIndex; right < beaconList.size(); right++) {
+                if (Math.abs(beaconList.get(currentIndex).getRssi() - beaconList.get(right).getRssi()) <= circle) {
+                    endIndex = right;
+                } else {
+                    break;
+                }
+            }
+            int length = endIndex - startIndex + 1;
+            if (length > Max) {
+                Max = length;
+                //取中值
+                if (length == 1) {
+                    hit = beaconList.get(startIndex).getRssi();
+                } else {
+                    if (length % 2 == 0) {
+                        hit = (beaconList.get(startIndex + length / 2).getRssi() + beaconList.get(startIndex + length / 2 - 1).getRssi()) / 2;
+                    } else {
+                        hit = beaconList.get(startIndex + length / 2).getRssi();
+                    }
+                }
+            }
+        }
+        Log.i(TAG, "hitCircle: "+hit);
+        return hit;
+    }
 
-        return -1;
+    public void start(int interval) {
+        timer.schedule(timerTask, interval, interval);
+    }
+
+    public void stop() {
+        timer.cancel();
     }
 }
