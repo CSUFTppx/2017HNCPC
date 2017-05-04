@@ -2,6 +2,10 @@ package com.csuft.ppx.acquisition;
 
 import android.util.Log;
 
+import com.csuft.ppx.position.BeaconPoints;
+import com.csuft.ppx.position.Point;
+import com.csuft.ppx.position.PositionUtil;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -23,6 +27,9 @@ public class CacheHandler {
     private TimerTask timerTask;
     private List<Beacon> lastPosition = new ArrayList<>();
     private int circle = 3;
+    private static Beacon closeBeacon=null;//距离最近的那个beacon，为缓存
+    private static List<Beacon> ThreeBeacon=new ArrayList<>();//从所有接受到Beacon中赛选到的3个beacon
+    private static String[] closeTwoBeaconMAC=new String[2];//最近的两个beacon的MAC
 
     private CacheHandler() {
         timer = new Timer();
@@ -64,6 +71,7 @@ public class CacheHandler {
                     Beacon currentBeacon = list.get(0);
                     Log.i(TAG, "handlingData: "+currentBeacon.getMac());
                     currentBeacon.setRssi(hitCircle(list));
+                    Log.i(TAG, "handlingData: distance"+currentBeacon.getDistance());
                     lastPosition.add(currentBeacon);
                 } else {
                     //数据较少，取最强的
@@ -74,6 +82,39 @@ public class CacheHandler {
             //在这里回调，返回lastPosition
             Log.i(TAG, "handlingData: ***************华丽的分割线****************");
         }
+
+        //对接收到beacon进行排序
+        Collections.sort(lastPosition, new Comparator<Beacon>() {
+            @Override
+            public int compare(Beacon o1, Beacon o2) {
+                return (int) (o1.getDistance()- o2.getDistance());
+            }
+        });
+        //获取最近的那个beacon
+        Beacon mycloseBeacon=lastPosition.get(0);
+        //如果和上一次数据的beacon一样，就无需再计算
+
+        if(closeBeacon!=null&&mycloseBeacon.getMac().equals(closeBeacon.getMac())){
+
+        }else{
+            //不一样就再次获取
+            closeBeacon=mycloseBeacon;
+            closeTwoBeaconMAC= BeaconPoints.getAroundBeacon(mycloseBeacon);
+        }
+        //把距离最近，信号最强的那个首先加入
+        ThreeBeacon.add(mycloseBeacon);
+        //再把其他两个也加入
+        for(int i=0;i<lastPosition.size();i++){
+            if(lastPosition.get(i).getMac().equals(closeTwoBeaconMAC[0])||lastPosition.get(i).getMac().equals(closeTwoBeaconMAC[1]))
+                ThreeBeacon.add(lastPosition.get(i));
+        }
+        Log.i("hwm","进行计算的3个beacon为:");
+        for(Beacon b: ThreeBeacon){
+           Log.i("hwm","MAC:  "+b.getMac());
+        }
+        Point point= PositionUtil.getIstance().Position(ThreeBeacon);
+        Log.i("hwm","定位坐标为   ("+point.getX()+","+point.getY()+")");
+
     }
 
     private int hitCircle(List<Beacon> beaconList) {
