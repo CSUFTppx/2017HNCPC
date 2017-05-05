@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import com.csuft.ppx.Navi.BasisNaviActivity;
 import com.csuft.ppx.R;
 import com.csuft.ppx.activity.ParkActivity;
 import com.csuft.ppx.activity.SearchActivity;
@@ -45,6 +46,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.butstop:
+                Intent naviIntent=new Intent(getActivity(), BasisNaviActivity.class);
+                startActivity(naviIntent);
                 break;
             case R.id.butleave:
                 Intent intent2 = new Intent(getActivity(), ParkActivity.class);
