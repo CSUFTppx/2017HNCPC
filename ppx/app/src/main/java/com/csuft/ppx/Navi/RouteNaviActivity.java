@@ -3,7 +3,9 @@ package com.csuft.ppx.Navi;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.view.View;
 import android.view.Window;
+import android.widget.ProgressBar;
 
 import com.amap.api.navi.AMapNavi;
 import com.amap.api.navi.AMapNaviListener;
@@ -20,6 +22,10 @@ import com.amap.api.navi.model.NaviInfo;
 import com.autonavi.tbt.TrafficFacilityInfo;
 import com.csuft.ppx.R;
 import com.csuft.ppx.XunFeiUtil.TTSController;
+import com.csuft.ppx.acquisition.Cache;
+import com.csuft.ppx.acquisition.CacheHandler;
+import com.csuft.ppx.acquisition.LeOperation;
+import com.iflytek.cloud.thirdparty.V;
 
 
 public class RouteNaviActivity extends FragmentActivity implements AMapNaviListener{
@@ -28,12 +34,17 @@ public class RouteNaviActivity extends FragmentActivity implements AMapNaviListe
     AMapNavi mAMapNavi;
     Fragment mNaviFragemnt;
     TTSController mTtsManager;
+
+    //进度条
+    private ProgressBar progressBar;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_route_navi);
 
+        progressBar=(ProgressBar)findViewById(R.id.progressbar_navi);
         //语音初始化
        mTtsManager = TTSController.getInstance(getApplicationContext());
         mTtsManager.init();
@@ -117,7 +128,21 @@ public class RouteNaviActivity extends FragmentActivity implements AMapNaviListe
     @Override
     public void onArriveDestination() {
         //到达目的地后
+        //显示进度条
+        progressBar.setVisibility(View.VISIBLE);
 
+        LeOperation.getInstance().start();//开始扫描
+        while (true) {
+            if (Cache.getInstance().isCacheEnough()) {
+                //数据充足，跳出循环
+                //取消进度条，进入地图
+                progressBar.setVisibility(View.GONE);
+                break;
+            } else {
+                continue;
+            }
+        }
+        CacheHandler.getInstance().start(1500);//开始处理数据，间隔1500ms
     }
 
     @Override
