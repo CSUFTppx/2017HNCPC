@@ -1,10 +1,13 @@
 package com.csuft.ppx.position;
 
+import android.util.Log;
+
 import com.csuft.ppx.acquisition.Beacon;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
-
 
 
 /**
@@ -19,6 +22,10 @@ public class PositionUtil {
     //定义当前的位置
     private Point point;
 
+    private static Beacon closeBeacon=null;//距离最近的那个beacon，为缓存
+    private static List<Beacon> ThreeBeacon=new ArrayList<>();//从所有接受到Beacon中赛选到的3个beacon
+    private static String[] closeTwoBeaconMAC=new String[2];//最近的两个beacon的MAC
+
     private static volatile PositionUtil positionUtil;
     //初始化
     public static PositionUtil getIstance(){
@@ -32,7 +39,8 @@ public class PositionUtil {
         // TODO Auto-generated constructor stub
         //PointInital();
     }
-
+/*
+    //根据传过来的beacon实现定位
     public Point Position(List<Beacon> beacons){
         //每次调用就清空arraylist
         circulars.clear();
@@ -43,21 +51,61 @@ public class PositionUtil {
         //根据3个圆定位
         point=getPoint(circulars);
         return point;
+    }*/
+    //实现定位
+    public Point Position(List<Beacon> beacons){
+        //处理传过来的beacon
+        handlerBeacon(beacons);
+        //清除圆集合的缓存
+        circulars.clear();
+        //把给出的beacon转化为圆加入到集合中
+        for(Beacon b:ThreeBeacon){
+            circulars.add(toCircular(b));
+        }
+        //根据3个圆定位
+        point=getPoint(circulars);
+        return point;
+
     }
 
-    /*
-    //根据建模，把每个beacon分别赋予一个坐标点
-    private void PointInital(){
-     //   BeaconPoints.put("19:18:FC:03:B6:AD",new Point(2.4,12));
-        BeaconPoints.put("19:18:FC:03:B6:A0",new Point(0,0));
-       // BeaconPoints.put("19:18:FC:03:B6:AA",new Point(0,0));
-        BeaconPoints.put("19:18:FC:03:B6:AB",new Point(2.4,12));
-        BeaconPoints.put("19:18:FC:03:B6:C2",new Point(0,8));
-        BeaconPoints.put("19:18:FC:03:B6:BA",new Point(2.4,4));
-       //BeaconPoints.put("19:18:FC:03:07:D2",new Point(2.4,12));
-       // BeaconPoints.put("19:18:FC:03:07:AD",new Point(2.4,12));
-       // BeaconPoints.put("19:18:FC:03:07:A4",new Point(5,5));
-    }*/
+    //将接受的beacon处理，获得用于计算的3个beacon
+    private void  handlerBeacon(List<Beacon> beacons){
+        //将接收到的beacon进行排序
+        Collections.sort(beacons, new Comparator<Beacon>() {
+            @Override
+            public int compare(Beacon o1, Beacon o2) {
+                return (int) (o1.getDistance()- o2.getDistance());
+            }
+        });
+        //获取最近的那个beacon
+        Beacon mycloseBeacon=beacons.get(0);
+
+        //如果和上一次数据的beacon一样，就无需再计算距离最近的beacon的mac
+        if(closeBeacon!=null&&mycloseBeacon.getMac().equals(closeBeacon.getMac())){
+
+        }else{
+            //不一样就再次获取
+            closeBeacon=mycloseBeacon;
+            //获取给出beacon的周围的最近的两个beacon的mac
+            closeTwoBeaconMAC= BeaconPoints.getAroundBeacon(mycloseBeacon);
+        }
+        //每次清除
+        ThreeBeacon.clear();
+        //把距离最近，信号最强的那个首先加入
+        ThreeBeacon.add(mycloseBeacon);
+        //再把其他两个也加入
+        for(int i=0;i<beacons.size();i++){
+            if(beacons.get(i).getMac().equals(closeTwoBeaconMAC[0])||beacons.get(i).getMac().equals(closeTwoBeaconMAC[1]))
+                ThreeBeacon.add(beacons.get(i));
+        }
+        Log.i("hwm","进行计算的3个beacon为:");
+        for(Beacon b: ThreeBeacon){
+            Log.i("hwm","MAC:  "+b.getMac());
+        }
+
+    }
+
+
     //根据给定的Beacon，把他转化为相对应的圆
     private static Circular toCircular(Beacon beacon){
         Circular c=null;
@@ -71,9 +119,9 @@ public class PositionUtil {
         //根据MAC来获取当前Beacon的坐标的
         //X=BeaconPoints.get(MAC).getX();
         //Y=BeaconPoints.get(MAC).getY();
-        System.out.println("当前转化的Beacon MAC为:"+MAC);
-        X=BeaconPoints.beaconPointModels.get(MAC).getX();
-        Y=BeaconPoints.beaconPointModels.get(MAC).getY();
+       // System.out.println("当前转化的Beacon MAC为:"+MAC);
+        X= BeaconPoints.beaconPointModels.get(MAC).getX();
+        Y= BeaconPoints.beaconPointModels.get(MAC).getY();
         if(X==-1||Y==-1){
             System.out.print("出错");
             return null;
@@ -120,9 +168,9 @@ public class PositionUtil {
 
 
     //求两个圆c1和c2的交点,并且这个交点在c3这个圆的范围内
-    private  static Point intersect(Circular c1,Circular c2,Circular c3){
-        System.out.println("半径为"+c1.getR()+"与 半径为"+c2.getR()+"的交点");
-        System.out.println();
+    private  static Point intersect(Circular c1, Circular c2, Circular c3){
+       // System.out.println("半径为"+c1.getR()+"与 半径为"+c2.getR()+"的交点");
+       // System.out.println();
         Point result;
         double x1=c1.getX(),y1=c1.getY(),r1=c1.getR();
         double x2=c2.getX(),y2=c2.getY(),r2=c2.getR();
@@ -148,12 +196,12 @@ public class PositionUtil {
 
             if(index<0){
                 //两个圆没有交点
-                System.out.println("两个圆没有交点,取他们半径中间值为");
+             //   System.out.println("两个圆没有交点,取他们半径中间值为");
                 //如果两个圆没有交点就取他们半径的中间值
                 result=new Point();
                 result.setX((c1.getX()+c2.getX())/2);
                 result.setY((c1.getY()+c2.getY())/2);
-                System.out.println("合理交点为:("+result.getX()+","+result.getY()+")");
+               // System.out.println("合理交点为:("+result.getX()+","+result.getY()+")");
                 //return result;
             }
             else{
@@ -177,7 +225,7 @@ public class PositionUtil {
                     }
 
                 }
-                System.out.println("合理交点为:("+result.getX()+","+result.getY()+")");
+               // System.out.println("合理交点为:("+result.getX()+","+result.getY()+")");
                 // return result;
             }
         }else{
@@ -197,7 +245,7 @@ public class PositionUtil {
             }else{
                 result=new Point(xx, yy2);
             }
-            System.out.println("合理的点为("+result.getX()+","+result.getY()+")");
+           // System.out.println("合理的点为("+result.getX()+","+result.getY()+")");
             //return result;
         }
         return result;
