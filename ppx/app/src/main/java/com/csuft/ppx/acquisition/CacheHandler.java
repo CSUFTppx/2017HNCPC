@@ -2,7 +2,6 @@ package com.csuft.ppx.acquisition;
 
 import android.util.Log;
 
-import com.csuft.ppx.position.BeaconPoints;
 import com.csuft.ppx.position.Point;
 import com.csuft.ppx.position.PositionUtil;
 
@@ -27,9 +26,9 @@ public class CacheHandler {
     private TimerTask timerTask;
     private List<Beacon> lastPosition = new ArrayList<>();
     private int circle = 3;
-    private static Beacon closeBeacon=null;//距离最近的那个beacon，为缓存
-    private static List<Beacon> ThreeBeacon=new ArrayList<>();//从所有接受到Beacon中赛选到的3个beacon
-    private static String[] closeTwoBeaconMAC=new String[2];//最近的两个beacon的MAC
+    //private static Beacon closeBeacon=null;//距离最近的那个beacon，为缓存
+    //private static List<Beacon> ThreeBeacon=new ArrayList<>();//从所有接受到Beacon中赛选到的3个beacon
+    //private static String[] closeTwoBeaconMAC=new String[2];//最近的两个beacon的MAC
 
     private CacheHandler() {
         timer = new Timer();
@@ -82,7 +81,7 @@ public class CacheHandler {
             //在这里回调，返回lastPosition
             Log.i(TAG, "handlingData: ***************华丽的分割线****************");
         }
-
+        /*
         //对接收到beacon进行排序
         Collections.sort(lastPosition, new Comparator<Beacon>() {
             @Override
@@ -101,6 +100,8 @@ public class CacheHandler {
             closeBeacon=mycloseBeacon;
             closeTwoBeaconMAC= BeaconPoints.getAroundBeacon(mycloseBeacon);
         }
+        //每次清除
+        ThreeBeacon.clear();
         //把距离最近，信号最强的那个首先加入
         ThreeBeacon.add(mycloseBeacon);
         //再把其他两个也加入
@@ -111,9 +112,12 @@ public class CacheHandler {
         Log.i("hwm","进行计算的3个beacon为:");
         for(Beacon b: ThreeBeacon){
            Log.i("hwm","MAC:  "+b.getMac());
-        }
-        Point point= PositionUtil.getIstance().Position(ThreeBeacon);
+        }*/
+        //根据beacon实现定位
+        Point point= PositionUtil.getIstance().Position(lastPosition);
+        Log.i(TAG, "handlingData: ***************华丽的分割线****************");
         Log.i("hwm","定位坐标为   ("+point.getX()+","+point.getY()+")");
+        Log.i(TAG, "handlingData: ***************华丽的分割线****************");
 
     }
 
