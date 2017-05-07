@@ -1,7 +1,10 @@
 package com.csuft.ppx.acquisition;
 
+import android.os.Message;
 import android.util.Log;
 
+import com.csuft.ppx.activity.ParkActivity;
+import com.csuft.ppx.position.BeaconPoints;
 import com.csuft.ppx.position.Point;
 import com.csuft.ppx.position.PositionUtil;
 
@@ -26,9 +29,9 @@ public class CacheHandler {
     private TimerTask timerTask;
     private List<Beacon> lastPosition = new ArrayList<>();
     private int circle = 3;
-    //private static Beacon closeBeacon=null;//距离最近的那个beacon，为缓存
-    //private static List<Beacon> ThreeBeacon=new ArrayList<>();//从所有接受到Beacon中赛选到的3个beacon
-    //private static String[] closeTwoBeaconMAC=new String[2];//最近的两个beacon的MAC
+    private static Beacon closeBeacon=null;//距离最近的那个beacon，为缓存
+    private static List<Beacon> ThreeBeacon=new ArrayList<>();//从所有接受到Beacon中赛选到的3个beacon
+    private static String[] closeTwoBeaconMAC=new String[2];//最近的两个beacon的MAC
 
     private CacheHandler() {
         timer = new Timer();
@@ -81,7 +84,7 @@ public class CacheHandler {
             //在这里回调，返回lastPosition
             Log.i(TAG, "handlingData: ***************华丽的分割线****************");
         }
-        /*
+        
         //对接收到beacon进行排序
         Collections.sort(lastPosition, new Comparator<Beacon>() {
             @Override
@@ -112,12 +115,25 @@ public class CacheHandler {
         Log.i("hwm","进行计算的3个beacon为:");
         for(Beacon b: ThreeBeacon){
            Log.i("hwm","MAC:  "+b.getMac());
-        }*/
+        }
         //根据beacon实现定位
-        Point point= PositionUtil.getIstance().Position(lastPosition);
-        Log.i(TAG, "handlingData: ***************华丽的分割线****************");
-        Log.i("hwm","定位坐标为   ("+point.getX()+","+point.getY()+")");
-        Log.i(TAG, "handlingData: ***************华丽的分割线****************");
+        if (ThreeBeacon.size()==3) {
+            try{
+                Point point = PositionUtil.getIstance().Position(ThreeBeacon);
+                Log.i(TAG, "handlingData: ***************华丽的分割线****************");
+                Log.i("hwm", "定位坐标为   (" + point.getX() + "," + point.getY() + ")");
+                Log.i(TAG, "handlingData: ***************华丽的分割线****************");
+                Message message = new Message();
+                message.what = 1;
+                message.arg1 = (int) (point.getX() * 100);
+                message.arg2 = (int) (point.getY() * 100);
+                ParkActivity.handler.sendMessage(message);
+            }catch (Exception e){
+                Log.i(TAG, "handlingData: 此次定位失败，重新定位");
+            }
+        }
+        else
+            Log.i(TAG, "handlingData: 此次定位失败，重新定位");
 
     }
 

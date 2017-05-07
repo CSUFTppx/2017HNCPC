@@ -22,9 +22,9 @@ public class PositionUtil {
     //定义当前的位置
     private Point point;
 
-    private static Beacon closeBeacon=null;//距离最近的那个beacon，为缓存
-    private static List<Beacon> ThreeBeacon=new ArrayList<>();//从所有接受到Beacon中赛选到的3个beacon
-    private static String[] closeTwoBeaconMAC=new String[2];//最近的两个beacon的MAC
+   // private static Beacon closeBeacon=null;//距离最近的那个beacon，为缓存
+    //private static List<Beacon> ThreeBeacon=new ArrayList<>();//从所有接受到Beacon中赛选到的3个beacon
+   // private static String[] closeTwoBeaconMAC=new String[2];//最近的两个beacon的MAC
 
     private static volatile PositionUtil positionUtil;
     //初始化
@@ -39,9 +39,9 @@ public class PositionUtil {
         // TODO Auto-generated constructor stub
         //PointInital();
     }
-/*
+
     //根据传过来的beacon实现定位
-    public Point Position(List<Beacon> beacons){
+    public Point Position(List<Beacon> beacons)throws Exception{
         //每次调用就清空arraylist
         circulars.clear();
         //把给出的beacon转化为圆加入到集合中
@@ -51,7 +51,8 @@ public class PositionUtil {
         //根据3个圆定位
         point=getPoint(circulars);
         return point;
-    }*/
+    }
+    /*
     //实现定位
     public Point Position(List<Beacon> beacons){
         //处理传过来的beacon
@@ -105,7 +106,7 @@ public class PositionUtil {
 
     }
 
-
+*/
     //根据给定的Beacon，把他转化为相对应的圆
     private static Circular toCircular(Beacon beacon){
         Circular c=null;

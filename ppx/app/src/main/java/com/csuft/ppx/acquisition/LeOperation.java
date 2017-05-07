@@ -22,7 +22,7 @@ public class LeOperation {
     private boolean state = false;
 
     private LeOperation() {
-        manager = (BluetoothManager) ApplicationData.mainActivity.getSystemService(Context.BLUETOOTH_SERVICE);
+        manager = (BluetoothManager) ApplicationData.baseActivity.getSystemService(Context.BLUETOOTH_SERVICE);
         adapter = manager.getAdapter();
         callback = new BluetoothAdapter.LeScanCallback() {
             @Override
