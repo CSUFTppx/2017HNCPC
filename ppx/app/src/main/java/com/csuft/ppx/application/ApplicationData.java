@@ -12,6 +12,7 @@ import com.csuft.ppx.MainActivity;
 
 public class ApplicationData extends Application {
     public static Context globalContext;
+    public static Context baseActivity;
     public static Context mainActivity;
 
     @Override
@@ -20,7 +21,12 @@ public class ApplicationData extends Application {
         globalContext = this;
     }
 
+    public static void setBaseActivity(Context baseActivity) {
+        ApplicationData.baseActivity = baseActivity;
+    }
+
     public static void setMainActivity(Context context) {
         mainActivity = context;
     }
+
 }
