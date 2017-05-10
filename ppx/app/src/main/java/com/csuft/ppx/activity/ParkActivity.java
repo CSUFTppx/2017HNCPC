@@ -1,15 +1,18 @@
 package com.csuft.ppx.activity;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.design.widget.FloatingActionButton;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -19,6 +22,7 @@ import com.csuft.ppx.acquisition.LeOperation;
 import com.csuft.ppx.bean.BeanSearch;
 import com.csuft.ppx.bean.FindPath;
 import com.csuft.ppx.bean.Method;
+import com.csuft.ppx.bean.MyView;
 import com.csuft.ppx.bean.Place;
 import com.csuft.ppx.position.Point;
 
@@ -28,8 +32,10 @@ import java.util.List;
 public class ParkActivity extends BaseActivity implements OnClickListener {
 
 //    private static TextView tv;
-    private TextView ppx;
+//    private TextView ppx;
     private static ImageView car;
+//    private FloatingActionButton fab;
+    private ImageButton fab;
     //停车位
     private ImageView carport1;
     private ImageView carport2;
@@ -39,28 +45,31 @@ public class ParkActivity extends BaseActivity implements OnClickListener {
     private ImageView carport6;
     private List<ImageView> carportList = new ArrayList<ImageView>();
     //选择车位
-    private TextView selectPack;
-    private TextView stop;
+//    private TextView selectPack;
+//    private TextView stop;
     static float density;  // 屏幕密度（0.75 / 1.0 / 1.5）
 
     public List<Place> placeList;
 
     //测试
-    public static List<com.csuft.ppx.position.Point> points;
+    public static List<Point> points;
     //寻路
     List<FindPath> findPathList = new ArrayList<FindPath>();
-    private Method method;
-    public static PathRunnable pathRunnable = new PathRunnable();
-    int step = 100;
-    static int delay = 1500;
+    //到达的车位
+    private static int carPort = 0;
+    private static Method method;
+    //移动
+    //public static PathRunnable pathRunnable = new PathRunnable();
+    int step = 20;
+    static int delay = 100;
+    private static MyView myView;
     public static final Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what){
                 case 1:
-//                    move(250,(int)((float)((130-msg.arg2*7.0)*density)));
-                    double x = (double)msg.arg1/100*20.0*density;
-                    double y = (double)msg.arg2/100*20.0*density;
+                    double x = (double)msg.arg1/100*density;
+                    double y = (double)msg.arg2/100*density;
                     Log.v("step","~~~~~~~~~~"+x+" "+y);
                     com.csuft.ppx.position.Point point = new com.csuft.ppx.position.Point(x,y);
                     points.add(point);
@@ -70,9 +79,7 @@ public class ParkActivity extends BaseActivity implements OnClickListener {
         }
     };
     //定时器
-//    final Handler handler2 = new Handler();
-//    public static PathRunnable pathRunnable = new PathRunnable();
-//    int step = 100;
+//    public final static Handler handler = new Handler();
 //    PathRunnable runnable = null;
 
     //最大权值
@@ -85,9 +92,20 @@ public class ParkActivity extends BaseActivity implements OnClickListener {
         points = new ArrayList<Point>();
         initWidget();
         checkBlePermission();
+        startBlue();
 //        initOther();
 
 
+    }
+    //运行蓝牙接收装置
+    private void startBlue(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                LeOperation.getInstance().start();
+                CacheHandler.getInstance().start(1500);
+            }
+        }).start();
     }
     //初始化其他方法
 //    private void initOther(){
@@ -109,11 +127,12 @@ public class ParkActivity extends BaseActivity implements OnClickListener {
 //
 //    }
 
+    //接收后运行
     static class PathRunnable implements Runnable{
         @Override
         public void run() {
-            com.csuft.ppx.position.Point p1;
-            com.csuft.ppx.position.Point p2;
+            Point p1;
+            Point p2;
             if (points.size()==0)
                 return ;
             if (points.size()==1){
@@ -140,9 +159,6 @@ public class ParkActivity extends BaseActivity implements OnClickListener {
                     e.printStackTrace();
                 }
             }
-
-//            handler.postDelayed(new PathRunnable(), delay+1);
-
         }
     }
     static class TestRunable implements  Runnable{
@@ -157,6 +173,7 @@ public class ParkActivity extends BaseActivity implements OnClickListener {
             move(x,y);
         }
     }
+
     //初始化控件
     private void initWidget(){
         //屏幕分辨率
@@ -164,21 +181,31 @@ public class ParkActivity extends BaseActivity implements OnClickListener {
         getWindowManager().getDefaultDisplay().getMetrics(metric);
         density = metric.density;
 
-        ppx = (TextView) findViewById(R.id.ppx);
-        ppx.setOnClickListener(new OnClickListener() {
+        method = new Method();
+//        ppx = (TextView) findViewById(R.id.ppx);
+//        ppx.setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+////                initOther();
+////                handler.postDelayed(new PathRunnable(), delay);
+//
+//                new Thread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        LeOperation.getInstance().start();
+//                        CacheHandler.getInstance().start(1500);
+//                    }
+//                }).start();
+//
+//            }
+//        });
+//        fab = (FloatingActionButton)findViewById(R.id.fab);
+        fab = (ImageButton)findViewById(R.id.fab);
+        fab.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-//                initOther();
-//                handler.postDelayed(new PathRunnable(), delay);
-
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        LeOperation.getInstance().start();
-                        CacheHandler.getInstance().start(1500);
-                    }
-                }).start();
-
+                for(ImageView carPort:carportList)
+                    carPort.setVisibility(View.VISIBLE);
             }
         });
         car = (ImageView)findViewById(R.id.car);
@@ -192,60 +219,78 @@ public class ParkActivity extends BaseActivity implements OnClickListener {
         carport4.setOnClickListener(this);
         carport5 = (ImageView)findViewById(R.id.carport5);
         carport5.setOnClickListener(this);
-        carport6 = (ImageView)findViewById(R.id.carport6);
-        carport6.setOnClickListener(this);
         carportList.add(carport1);
         carportList.add(carport2);
         carportList.add(carport3);
         carportList.add(carport4);
         carportList.add(carport5);
-        carportList.add(carport6);
-        selectPack = (TextView) findViewById(R.id.select_pack);
-        selectPack.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                for(ImageView carPort:carportList)
-                    carPort.setVisibility(View.VISIBLE);
-            }
-        });
+        myView = (MyView) findViewById(R.id.myview);
+//        selectPack = (TextView) findViewById(R.id.select_pack);
+//        selectPack.setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                for(ImageView carPort:carportList)
+//                    carPort.setVisibility(View.VISIBLE);
+//            }
+//        });
     }
     @Override
     public void onClick(View view) {
-        int carPort = 0;
         switch(view.getId()){
             case R.id.carport1:
-                carPort = 7;
+                carPort = 10;
                 break;
             case R.id.carport2:
-                carPort = 6;
-                break;
-            case R.id.carport3:
                 carPort = 9;
                 break;
-            case R.id.carport4:
+            case R.id.carport3:
                 carPort = 8;
                 break;
-            case R.id.carport5:
-                carPort = 12;
+            case R.id.carport4:
+                carPort = 6;
                 break;
-            case R.id.carport6:
-                carPort = 14;
+            case R.id.carport5:
+                carPort = 5;
                 break;
         }
         for(ImageView cp:carportList)
             cp.setVisibility(View.GONE);
         findPathList = method.getShortPath(carPort,car,density);
-
+        lineDraw();
 //        if(runnable == null) {
 //            runnable = new PathRunnable();
 //        }
 //        runnable.setSpaceSize();
 //        handler.postDelayed(runnable, delay);
     }
-
+    public static void lineDraw(){
+        List<FindPath> findPathLists = method.getShortPath(carPort,car,density);
+        String string = "---------";
+        for(FindPath findPath:findPathLists)
+            string += " "+findPath.startPath+" to "+findPath.endPath+" "+findPath.endLocation+";";
+        Log.v("ling",string);
+        List<Place> places = method.getPlaceList();
+        List xxList = new ArrayList();
+        List yyList = new ArrayList();
+        xxList.add(car.getX());
+        yyList.add(car.getY());
+        Log.v("ling",""+findPathLists.size());
+        for(int i=findPathLists.size()-1;i>=0;i--){
+            FindPath findPath = findPathLists.get(i);
+            if(findPath.startPath!=0){
+                Place ps = places.get(findPath.startPath);
+                xxList.add(ps.x*density);
+                yyList.add(ps.y*density);
+            }
+            Place pe = places.get(findPath.endPath);
+            xxList.add(pe.x*density);
+            yyList.add(pe.y*density);
+        }
+        myView.reDraw(xxList,yyList);
+    }
     int currentPath = 0;
 
-    //运动路线
+    //测试运动路线
 //    class PathRunnable implements Runnable {
 //        Point startPoint;
 //
@@ -255,7 +300,7 @@ public class ParkActivity extends BaseActivity implements OnClickListener {
 //        boolean isEnd = false;
 //
 //        //绘图坐标
-//        float xx=0,yy=0;
+////        float xx=0,yy=0;
 //
 //        public PathRunnable(){
 //            // this.spaceSize = spaceSize;
@@ -295,30 +340,35 @@ public class ParkActivity extends BaseActivity implements OnClickListener {
 //                }
 //                switch (pathInfo.direction) {
 //                    case "left":
-//                        xx -= step;
-//                        move(left-step,top);
-//                        if (left - step <= pathInfo.endLocation * density)
+////                        xx -= step;
+//                        if (left - step < pathInfo.endLocation * density)
 //                            runPath = pathInfo.endPath;
+//                        else
+//                            move(left-step,top);
 //                        break;
 //                    case "top":
-//                        yy -= step;
-//                        move(left,top-step);
-//                        if (top - step <= pathInfo.endLocation * density)
+////                        yy -= step;
+//                        if (top - step < pathInfo.endLocation * density)
 //                            runPath = pathInfo.endPath;
+//                        else
+//                            move(left,top-step);
 //                        break;
 //                    case "right":
-//                        xx += step;
-//                        move(left+step,top);
-//                        if (left + step >= pathInfo.endLocation * density)
+////                        xx += step;
+//                        if (left + step > pathInfo.endLocation * density)
 //                            runPath = pathInfo.endPath;
+//                        else
+//                            move(left+step,top);
 //                        break;
 //                    case "button":
-//                        yy += step;
-//                        move(left,top+step);
+////                        yy += step;
 //                        if (top + step >= pathInfo.endLocation * density)
 //                            runPath = pathInfo.endPath;
+//                        else
+//                            move(left,top+step);
 //                        break;
 //                }
+//                lineDraw();
 //                if (!isEnd) {
 //                    handler.postDelayed(this, delay);
 //                }

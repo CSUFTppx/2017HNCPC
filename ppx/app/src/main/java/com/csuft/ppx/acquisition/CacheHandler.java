@@ -125,8 +125,8 @@ public class CacheHandler {
                 Log.i(TAG, "handlingData: ***************华丽的分割线****************");
                 Message message = new Message();
                 message.what = 1;
-                message.arg1 = (int) (point.getX() * 100);
-                message.arg2 = (int) (point.getY() * 100);
+                message.arg1 = (int) (point.getX()*17.5*100);
+                message.arg2 = (int) (point.getY()*13.3*100);
                 ParkActivity.handler.sendMessage(message);
             }catch (Exception e){
                 Log.i(TAG, "handlingData: 此次定位失败，重新定位");

@@ -16,118 +16,157 @@ public class Method {
     final int max_val = Integer.MAX_VALUE;
     //线路
     private List<Path> pathList;
-    int pointCount = 16;
     int currentPath = 0;
 
     //寻路
-    List<FindPath> findPathList = new ArrayList<FindPath>();
+    private List<FindPath> findPathList = new ArrayList<FindPath>();
     //位置信息
-    List<Place> placeList;
+    private List<Place> placeList;
 
     public Method(){
         placeList = getPlaceList();
         pathList = getPath();
     }
+    //点所能到达的路径
     public List<Path> getPath(){
         List<Path> pathList = new ArrayList<Path>();
-        Path path = new Path(1,2,190);
+        Path path = new Path(1,20);
         pathList.add(path);
-        path = new Path(2,3,250);
+        path = new Path(20,21);
         pathList.add(path);
-        path = new Path(2,1,190);
+        path = new Path(21,22);
         pathList.add(path);
-        path = new Path(3,2,250);
+        path = new Path(22,23);
         pathList.add(path);
-        path = new Path(3,4,70);
+        path = new Path(23,2);
         pathList.add(path);
-        path = new Path(3,10,90);
+
+        path = new Path(2,24);
         pathList.add(path);
-        path = new Path(4,3,70);
+        path = new Path(24,25);
         pathList.add(path);
-        path = new Path(4,6,70);
+        path = new Path(25,26);
         pathList.add(path);
-        path = new Path(4,5,60);
+        path = new Path(26,14);
         pathList.add(path);
-        path = new Path(4,8,80);
+        path = new Path(2,3);
         pathList.add(path);
-        path = new Path(5,4,60);
+
+        path = new Path(3,4);
         pathList.add(path);
-        path = new Path(5,7,70);
+        path = new Path(3,6);
         pathList.add(path);
-        path = new Path(5,9,80);
+        path = new Path(4,5);
         pathList.add(path);
-        path = new Path(6,4,70);
+        path = new Path(5,17);
         pathList.add(path);
-        path = new Path(7,5,70);
+        path = new Path(17,16);
         pathList.add(path);
-        path = new Path(8,4,80);
+        path = new Path(6,18);
         pathList.add(path);
-        path = new Path(9,5,80);
+        path = new Path(18,15);
         pathList.add(path);
-        path = new Path(10,3,90);
+        path = new Path(8,19);
         pathList.add(path);
-        path = new Path(10,11,50);
+        path = new Path(19,13);
         pathList.add(path);
-        path = new Path(10,12,70);
+        path = new Path(9,27);
         pathList.add(path);
-        path = new Path(10,14,80);
+        path = new Path(27,12);
         pathList.add(path);
-        path = new Path(11,13,70);
+        path = new Path(10,28);
         pathList.add(path);
-        path = new Path(11,15,70);
+        path = new Path(28,11);
         pathList.add(path);
-        path = new Path(12,10,70);
+        path = new Path(11,12);
         pathList.add(path);
-        path = new Path(13,11,70);
+        path = new Path(12,13);
         pathList.add(path);
-        path = new Path(14,10,80);
+        path = new Path(13,14);
         pathList.add(path);
-        path = new Path(15,11,80);
+        path = new Path(14,15);
+        pathList.add(path);
+        path = new Path(15,16);
         pathList.add(path);
 
         return pathList;
 
     }
+    //各个点的坐标
     public List<Place> getPlaceList(){
         List<Place> list = new ArrayList<Place>();
         Place place = new Place(0,0,0);
         list.add(place);
-        place = new Place(1,20,0);
+        place = new Place(1,300,48);//300 - 260
         list.add(place);
-        place = new Place(2,20,190);
+        place = new Place(2,300,305);
         list.add(place);
-        place = new Place(3,250,190);
+        place = new Place(3,300,408);
         list.add(place);
-        place = new Place(4,250,120);
+        place = new Place(4,300,488);
         list.add(place);
-        place = new Place(5,240,60);
+        place = new Place(5,190,488);
         list.add(place);
-        place = new Place(6,180,120);
+        place = new Place(6,190,408);
         list.add(place);
-        place = new Place(7,180,60);
+        place = new Place(7,190,303);
         list.add(place);
-        place = new Place(8,330,120);
+        place = new Place(8,190,200);
         list.add(place);
-        place = new Place(9,330,60);
+        place = new Place(9,190,150);
         list.add(place);
-        place = new Place(10,250,380);
+        place = new Place(10,190,58);
         list.add(place);
-        place = new Place(11,250,430);
+        place = new Place(11,60,58);
         list.add(place);
-        place = new Place(12,180,380);
+        place = new Place(12,60,150);
         list.add(place);
-        place = new Place(13,280,430);
+        place = new Place(13,60,200);
         list.add(place);
-        place = new Place(14,330,380);
+        place = new Place(14,60,305);
         list.add(place);
-        place = new Place(15,330,430);
+        place = new Place(15,60,408);
+        list.add(place);
+        place = new Place(16,60,488);
+        list.add(place);
+
+
+        //辅助坐标
+        place = new Place(17,160,488);
+        list.add(place);
+        place = new Place(18,160,408);
+        list.add(place);
+        place = new Place(19,160,200);
+        list.add(place);
+
+        place = new Place(20,300,98);
+        list.add(place);
+        place = new Place(21,300,150);
+        list.add(place);
+        place = new Place(22,300,200);
+        list.add(place);
+        place = new Place(23,300,250);
+        list.add(place);
+
+        place = new Place(24,240,305);
+        list.add(place);
+        place = new Place(25,180,305);
+        list.add(place);
+        place = new Place(26,120,305);
+        list.add(place);
+
+        place = new Place(27,160,150);
+        list.add(place);
+        place = new Place(28,160,58);
+        list.add(place);
 
 
         return list;
     }
     //获得路径
     public List<FindPath> getShortPath(int n, ImageView car, float density){
-        findPathList.clear();
+        int pointCount = placeList.size();
+        List<FindPath> findPathList = new ArrayList<FindPath>();
         int x = (int)(car.getLeft()/density);
         int y = (int)(car.getTop()/density);
         float firstMin = max_val;
@@ -150,7 +189,9 @@ public class Method {
             }
         }
 
+        //a到b
         int pathAim[] = new int[pointCount];
+        //距离
         float val[] = new float[pointCount];
         for(int i=0;i<pathAim.length;i++){
             pathAim[i] = currentPath;
@@ -165,21 +206,18 @@ public class Method {
 
         while(!queue.isEmpty()){
             int current = queue.pop();
-//            for(int i=0;i<val.length;i++){
-//                if(path[current][i]!=max_val){
-//                    if(val[current]+path[current][i]<val[i]) {
-//                        val[i] = val[current] + path[current][i];
-//                        pathAim[i] = current;
-//                        queue.push(i);
-//                    }
-//                }
-//            }
             for(int i=0;i<pathList.size();i++){
                 if(current==pathList.get(i).startPath){
                     if(val[current]+pathList.get(i).distance<val[pathList.get(i).endPath]){
                         val[pathList.get(i).endPath] = val[current] + pathList.get(i).distance;
                         pathAim[pathList.get(i).endPath] = current;
                         queue.push(pathList.get(i).endPath);
+                    }
+                }else if(current==pathList.get(i).endPath){
+                    if(val[current]+pathList.get(i).distance<val[pathList.get(i).startPath]){
+                        val[pathList.get(i).startPath] = val[current] + pathList.get(i).distance;
+                        pathAim[pathList.get(i).startPath] = current;
+                        queue.push(pathList.get(i).startPath);
                     }
                 }
             }
@@ -250,15 +288,33 @@ public class Method {
         }
         return findPathList;
     }
-}
+    class Path{
+        public int startPath;
+        public int endPath;
+        public int distance;
+        public Path(int startPath,int endPath){
+            this.startPath = startPath;
+            this.endPath = endPath;
+            List<Place> places = getPlaceList();
+            Place ps = null;
+            Place pe = null;
+            for(Place p:places){
+                if(p.localtion==startPath)
+                    ps = p;
+                if(p.localtion==endPath)
+                    pe = p;
 
-class Path{
-    public int startPath;
-    public int endPath;
-    public int distance;
-    public Path(int startPath,int endPath,int distance){
-        this.startPath = startPath;
-        this.endPath = endPath;
-        this.distance = distance;
+            }
+            if(ps!=null&&pe!=null){
+                if(Math.abs(ps.x-pe.x)>Math.abs(ps.y-pe.y)){
+                    this.distance = Math.abs(ps.x-pe.x);
+                }else{
+                    this.distance = Math.abs(ps.y-pe.y);
+                }
+            }
+
+        }
     }
 }
+
+

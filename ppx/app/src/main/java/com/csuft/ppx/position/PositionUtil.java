@@ -22,9 +22,9 @@ public class PositionUtil {
     //定义当前的位置
     private Point point;
 
-   // private static Beacon closeBeacon=null;//距离最近的那个beacon，为缓存
-    //private static List<Beacon> ThreeBeacon=new ArrayList<>();//从所有接受到Beacon中赛选到的3个beacon
-   // private static String[] closeTwoBeaconMAC=new String[2];//最近的两个beacon的MAC
+    private static Beacon closeBeacon=null;//距离最近的那个beacon，为缓存
+    private static List<Beacon> ThreeBeacon=new ArrayList<>();//从所有接受到Beacon中赛选到的3个beacon
+    private static String[] closeTwoBeaconMAC=new String[2];//最近的两个beacon的MAC
 
     private static volatile PositionUtil positionUtil;
     //初始化
@@ -41,7 +41,7 @@ public class PositionUtil {
     }
 
     //根据传过来的beacon实现定位
-    public Point Position(List<Beacon> beacons)throws Exception{
+    public Point Position(List<Beacon> beacons){
         //每次调用就清空arraylist
         circulars.clear();
         //把给出的beacon转化为圆加入到集合中
@@ -197,12 +197,12 @@ public class PositionUtil {
 
             if(index<0){
                 //两个圆没有交点
-             //   System.out.println("两个圆没有交点,取他们半径中间值为");
+               System.out.println("两个圆没有交点,取他们半径中间值为");
                 //如果两个圆没有交点就取他们半径的中间值
                 result=new Point();
                 result.setX((c1.getX()+c2.getX())/2);
                 result.setY((c1.getY()+c2.getY())/2);
-               // System.out.println("合理交点为:("+result.getX()+","+result.getY()+")");
+               System.out.println("合理交点为:("+result.getX()+","+result.getY()+")");
                 //return result;
             }
             else{
@@ -226,7 +226,7 @@ public class PositionUtil {
                     }
 
                 }
-               // System.out.println("合理交点为:("+result.getX()+","+result.getY()+")");
+                System.out.println("合理交点为:("+result.getX()+","+result.getY()+")");
                 // return result;
             }
         }else{
@@ -246,7 +246,7 @@ public class PositionUtil {
             }else{
                 result=new Point(xx, yy2);
             }
-           // System.out.println("合理的点为("+result.getX()+","+result.getY()+")");
+           System.out.println("合理的点为("+result.getX()+","+result.getY()+")");
             //return result;
         }
         return result;
