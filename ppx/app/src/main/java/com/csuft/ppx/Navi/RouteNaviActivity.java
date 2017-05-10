@@ -1,5 +1,6 @@
 package com.csuft.ppx.Navi;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -22,6 +23,7 @@ import com.amap.api.navi.model.NaviInfo;
 import com.autonavi.tbt.TrafficFacilityInfo;
 import com.csuft.ppx.R;
 import com.csuft.ppx.XunFeiUtil.TTSController;
+import com.csuft.ppx.XunFeiUtil.XunFeiSpeak;
 import com.csuft.ppx.acquisition.Cache;
 import com.csuft.ppx.acquisition.CacheHandler;
 import com.csuft.ppx.acquisition.LeOperation;
@@ -35,8 +37,8 @@ public class RouteNaviActivity extends FragmentActivity implements AMapNaviListe
     Fragment mNaviFragemnt;
     TTSController mTtsManager;
 
-    //进度条
-    private ProgressBar progressBar;
+    //进度对话框
+    private ProgressDialog progressDialog;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +46,7 @@ public class RouteNaviActivity extends FragmentActivity implements AMapNaviListe
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_route_navi);
 
-        progressBar=(ProgressBar)findViewById(R.id.progressbar_navi);
+
         //语音初始化
        mTtsManager = TTSController.getInstance(getApplicationContext());
         mTtsManager.init();
@@ -128,15 +130,17 @@ public class RouteNaviActivity extends FragmentActivity implements AMapNaviListe
     @Override
     public void onArriveDestination() {
         //到达目的地后
+        //语音播放
+        XunFeiSpeak.getIance(RouteNaviActivity.this).Speak("请将车驶入缓慢驶入车库内");
         //显示进度条
-        progressBar.setVisibility(View.VISIBLE);
+        progressDialog=ProgressDialog.show(RouteNaviActivity.this,"请稍后","正在为你转化车库地图",true);
 
         LeOperation.getInstance().start();//开始扫描
         while (true) {
             if (Cache.getInstance().isCacheEnough()) {
                 //数据充足，跳出循环
                 //取消进度条，进入地图
-                progressBar.setVisibility(View.GONE);
+
                 break;
             } else {
                 continue;
