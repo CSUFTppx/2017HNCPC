@@ -1,11 +1,8 @@
 package com.csuft.ppx.activity;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.design.widget.FloatingActionButton;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -14,12 +11,10 @@ import android.view.Window;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.csuft.ppx.R;
 import com.csuft.ppx.acquisition.CacheHandler;
 import com.csuft.ppx.acquisition.LeOperation;
-import com.csuft.ppx.bean.BeanSearch;
 import com.csuft.ppx.bean.FindPath;
 import com.csuft.ppx.bean.Method;
 import com.csuft.ppx.bean.MyView;
@@ -99,13 +94,10 @@ public class ParkActivity extends BaseActivity implements OnClickListener {
     }
     //运行蓝牙接收装置
     private void startBlue(){
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
+
                 LeOperation.getInstance().start();
                 CacheHandler.getInstance().start(1500);
-            }
-        }).start();
+
     }
     //初始化其他方法
 //    private void initOther(){

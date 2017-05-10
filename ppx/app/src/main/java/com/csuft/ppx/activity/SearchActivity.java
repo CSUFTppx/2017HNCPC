@@ -37,7 +37,7 @@ public class SearchActivity extends BaseActivity implements View.OnClickListener
         searches = new ArrayList<BeanSearch>();
         searchesRecord = new ArrayList<BeanSearch>();
         initSearch();
-        parkAdapter = new ParkAdapter(SearchActivity.this,R.layout.item_search,searches);
+        parkAdapter = new ParkAdapter(SearchActivity.this, R.layout.item_search,searches);
         searchList.setAdapter(parkAdapter);
 
         //给edit设置改变事件

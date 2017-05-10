@@ -1,12 +1,8 @@
 package com.csuft.ppx.position;
 
-import android.util.Log;
-
 import com.csuft.ppx.acquisition.Beacon;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 
@@ -172,83 +168,126 @@ public class PositionUtil {
     private  static Point intersect(Circular c1, Circular c2, Circular c3){
        // System.out.println("半径为"+c1.getR()+"与 半径为"+c2.getR()+"的交点");
        // System.out.println();
-        Point result;
+        Point result=null;
         double x1=c1.getX(),y1=c1.getY(),r1=c1.getR();
         double x2=c2.getX(),y2=c2.getY(),r2=c2.getR();
-        double x3=c3.getX(),y3=c3.getY(),r3=c3.getR();
+        double x3=c3.getX(),y3=c3.getY();
         if(y1!=y2){
             //两个圆不一起在x轴上
             double M,N,A,B;
             //圆c1的方程表达式为  x*x+y*y-2*x1*x-2*y1*y+x1*x1+y1*y1-r1*r1=0,圆c2的方程表达式一样
+
             //两圆相交，可以得直线方程为  A-Bx=y,求得 A 和 B;
-            A=pf(x1)-pf(x2)+pf(y1)-pf(y2)+pf(r2)-pf(r1);
+            A=Math.pow(x1, 2)-Math.pow(x2, 2)+Math.pow(y1, 2)-Math.pow(y2, 2)+Math.pow(r2, 2)-Math.pow(r1, 2);
             A=A/(2*y1-2*y2);
 
             B=(x1-x2)/(y1-y2);
-           // System.out.println("A :"+A+"   B："+B);
+            //System.out.println("A :"+A+"   B："+B);
 
-            M=(x1+(A-y1)*B)/(1+pf(B));
-            N=(pf(x1)+pf(A-y1)-pf(r1))/(1+pf(B));
+            M=(x1+(A-y1)*B)/(1+Math.pow(B, 2));
+            N=(Math.pow(x1, 2)+Math.pow(A-y1, 2)-Math.pow(r1, 2))/(1+Math.pow(B, 2));
 
-           // System.out.println("M :"+M+"  N:"+N);
+            //System.out.println("M :"+M+"  N:"+N);
 
             //判断圆的交点有几个
-            double index=pf(2*M)-4*N;
+            double index=Math.pow(2*M, 2)-4*N;
 
             if(index<0){
                 //两个圆没有交点
-               System.out.println("两个圆没有交点,取他们半径中间值为");
+                System.out.println("两个圆没有交点");
                 //如果两个圆没有交点就取他们半径的中间值
                 result=new Point();
                 result.setX((c1.getX()+c2.getX())/2);
                 result.setY((c1.getY()+c2.getY())/2);
-               System.out.println("合理交点为:("+result.getX()+","+result.getY()+")");
+                System.out.println("取半径中间值为 ("+(c1.getX()+c2.getX())/2+","+(c1.getY()+c2.getY())/2+")");
                 //return result;
             }
             else{
                 //两个圆有交点
-                double xa=M+Math.sqrt(pf(M)-N);
+                double xa=M+Math.sqrt(Math.pow(M, 2)-N);
                 double ya=A-B*xa;
-               // System.out.println("一组交点为 ("+xa+","+ya+")");
-                double xb=M-Math.sqrt(pf(M)-N);
+                //System.out.println("一组交点为 ("+xa+","+ya+")");
+                double xb=M-Math.sqrt(Math.pow(M, 2)-N);
                 double yb=A-B*xb;
-                //System.out.println("另一组交点为 ("+xb+","+yb+")");
+                // System.out.println("另一组交点为 ("+xb+","+yb+")");
 
                 if(xa==xb){
                     //只有一个交点
                     result=new Point(xa, ya);
                 }else{
                     //两个交点，判断与第三个圆圆心距离更近的那个点
-                    if((pf(xa-x3)+pf(ya-y3))<=(pf(xb-x3)+pf(yb-y3))){
+                    if((Math.pow(xa-x3, 2)+Math.pow(ya-y3, 2))<=(Math.pow(xb-x3, 2)+Math.pow(yb-y3, 2))){
                         result=new Point(xa, ya);
                     }else{
                         result=new Point(xb, yb);
                     }
 
                 }
-                System.out.println("合理交点为:("+result.getX()+","+result.getY()+")");
-                // return result;
+                //System.out.println("合理交点为:("+result.getX()+","+result.getY()+")");
+                // return result;*/
             }
+
         }else{
-            //两个圆都在x轴上
+            //两个圆相同的y坐标,不考虑两个相容的情况
+            double yy1;
+            //两个圆心的的距离
+            double distan_l=Math.abs(x1-x2);
+
+
             //如果两圆心的距离大于半径之和，不存在交点
-            if(Math.abs(x1-x2)>(r1+r2))
-                return null;
-            //存在交点
-            double xx=(x1+x2)/2;
-
-            double yy1=Math.sqrt(pf(r1)-pf(xx-x1));
-            double yy2=-Math.sqrt(pf(r1)-pf(xx-x1));
-
-            //判断哪个点距离c3圆心的距离更小
-            if(pf(yy1-y3)<=pf(yy2-y3)){
-                result=new Point(xx, yy1);
-            }else{
-                result=new Point(xx, yy2);
+            if(distan_l>=(r1+r2)){
+                result=new Point((x1+x2)/2, y1);
+                System.out.println("两圆不存在交点，取他们中点为 ("+(x1+x2)/2+","+y1+")");
             }
-           System.out.println("合理的点为("+result.getX()+","+result.getY()+")");
-            //return result;
+            //存在交点
+            else{
+                //两个圆相交到中间
+                if(r1<distan_l&&r2<distan_l){
+
+                    double xx=(x1+x2)/2;
+                    yy1=Math.sqrt(Math.pow(r1, 2)-Math.pow(xx-x1, 2));
+                    System.out.println("一组交点为 ("+xx+","+(yy1+y1)+")   , 另一组交点为("+xx+","+(-yy1+y1)+")");
+
+                    if(Math.pow((yy1+y1)-y3, 2)<=Math.pow((-yy1+y1)-y3,2)){
+                        result=new Point(xx, yy1+y1);
+                    }else{
+                        result=new Point(xx, -yy1+y1);
+                    }
+
+                }
+                //相交到右半边，计算大约值
+                else if(r1>distan_l){
+                    yy1=Math.sqrt(Math.pow(r1, 2)-Math.pow(distan_l, 2));
+                    System.out.println("大约 一组交点为 ("+x2+","+(yy1+y1)+")   , 另一组交点为("+x2+","+(-yy1+y1)+")");
+
+                    if(Math.pow((yy1+y1)-y3, 2)<=Math.pow((-yy1+y1)-y3,2)){
+                        result=new Point(x2, yy1+y1);
+                    }else{
+                        result=new Point(x2, -yy1+y1);
+                    }
+                }
+                //相交到左半边，计算大约值
+                else if(r2>distan_l){
+
+                    yy1=Math.sqrt(Math.pow(r2, 2)-Math.pow(distan_l, 2));
+                    System.out.println("大约 一组交点为 ("+x1+","+(yy1+y1)+")   , 另一组交点为("+x1+","+(-yy1+y1)+")");
+
+                    if(Math.pow((yy1+y1)-y3, 2)<=Math.pow((-yy1+y1)-y3,2)){
+                        result=new Point(x1, yy1+y1);
+                    }else{
+                        result=new Point(x1, -yy1+y1);
+                    }
+                }
+                else{
+                    //
+                    System.out.println("两圆不存在交点，取他们中点为 ("+(x1+x2)/2+","+y1+")");
+                    result=new Point((x1+x2)/2, y1);
+                }
+
+            }
+
         }
+        System.out.println("合理的点为("+result.getX()+","+result.getY()+")");
         return result;
     }
 

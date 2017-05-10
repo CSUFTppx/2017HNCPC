@@ -49,7 +49,7 @@ public class BasisNaviActivity extends AppCompatActivity implements AMapNaviList
     定位功能对象定义
      */
     //终点坐标，固定为停车场
-    private NaviLatLng endLatlng = new NaviLatLng(28.13239284939236,113.001533203125);
+    private NaviLatLng endLatlng = new NaviLatLng(28.133966471354167,112.99830539279515);
     //导航起点坐标，根据定位获取
     private NaviLatLng startLatlng = new NaviLatLng();
     //声明AMapLocationClient类对象
@@ -260,7 +260,7 @@ public class BasisNaviActivity extends AppCompatActivity implements AMapNaviList
      */
     private void startNavi(){
         Intent gpsintent=new Intent(BasisNaviActivity.this,RouteNaviActivity.class);
-        gpsintent.putExtra("gps",false);// gps 为true为真实导航，为false为模拟导航
+        gpsintent.putExtra("gps",true);// gps 为true为真实导航，为false为模拟导航
         startActivity(gpsintent);
     }
     //点击事件

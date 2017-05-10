@@ -14,7 +14,7 @@ import com.csuft.ppx.application.ApplicationData;
  * Created by ling on 2017/5/5.
  */
 
-public class BaseActivity extends AppCompatActivity{
+public class BaseActivity extends AppCompatActivity {
     private static boolean BLE_PERMISSION = false;
     private static final int MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION = 1;
 

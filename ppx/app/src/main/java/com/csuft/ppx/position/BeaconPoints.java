@@ -17,13 +17,13 @@ public class BeaconPoints {
 
     static {
         //   beaconPointModels.put("19:18:FC:03:B6:AD",new Point(2.4,12));
-       beaconPointModels.put("19:18:FC:03:B6:A0",new Point(0,8));
-         beaconPointModels.put("19:18:FC:03:B6:AA",new Point(0,0));
-        //beaconPointModels.put("19:18:FC:03:B6:AB",new Point(0,0));
-       beaconPointModels.put("19:18:FC:03:B6:C2",new Point(0,2.4));
-       beaconPointModels.put("19:18:FC:03:B6:BA",new Point(2.4,4));
-       beaconPointModels.put("19:18:FC:03:07:D2",new Point(0,16.0));
-      beaconPointModels.put("19:18:FC:03:07:AD",new Point(2.4,12));
+      beaconPointModels.put("19:18:FC:03:B6:A0",new Point(15,0));
+      //   beaconPointModels.put("19:18:FC:03:B6:AA",new Point(0,0));
+       beaconPointModels.put("19:18:FC:03:B6:AB",new Point(18,0));
+       beaconPointModels.put("19:18:FC:03:B6:C2",new Point(18,6));
+      beaconPointModels.put("19:18:FC:03:B6:BA",new Point(15,3));
+       beaconPointModels.put("19:18:FC:03:07:D2",new Point(15,9));
+      beaconPointModels.put("19:18:FC:03:07:AD",new Point(18,12));
         // beaconPointModels.put("19:18:FC:03:07:A4",new Point(5,5));
     }
 
@@ -59,7 +59,7 @@ public class BeaconPoints {
     }
 
     //计算两个点之间的距离
-    private static Double pointsDistance(Point a,Point b){
+    private static Double pointsDistance(Point a, Point b){
         return Math.pow(a.getX()-b.getX(),2)+Math.pow(a.getY()-b.getY(),2);
     }
 

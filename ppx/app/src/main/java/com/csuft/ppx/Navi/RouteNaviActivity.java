@@ -39,13 +39,11 @@ public class RouteNaviActivity extends FragmentActivity implements AMapNaviListe
 
     //进度对话框
     private ProgressDialog progressDialog;
-    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_route_navi);
-
 
         //语音初始化
        mTtsManager = TTSController.getInstance(getApplicationContext());
@@ -130,17 +128,14 @@ public class RouteNaviActivity extends FragmentActivity implements AMapNaviListe
     @Override
     public void onArriveDestination() {
         //到达目的地后
-        //语音播放
-        XunFeiSpeak.getIance(RouteNaviActivity.this).Speak("请将车驶入缓慢驶入车库内");
         //显示进度条
-        progressDialog=ProgressDialog.show(RouteNaviActivity.this,"请稍后","正在为你转化车库地图",true);
-
+        XunFeiSpeak.getIance(RouteNaviActivity.this).Speak("请将车缓慢开进车库");
+        progressDialog=ProgressDialog.show(RouteNaviActivity.this,"请稍后","正在为你切换车库地图",true);
         LeOperation.getInstance().start();//开始扫描
         while (true) {
             if (Cache.getInstance().isCacheEnough()) {
                 //数据充足，跳出循环
                 //取消进度条，进入地图
-
                 break;
             } else {
                 continue;
