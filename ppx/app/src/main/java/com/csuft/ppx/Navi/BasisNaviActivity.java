@@ -1,6 +1,7 @@
 package com.csuft.ppx.Navi;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -45,6 +46,7 @@ import java.util.List;
 public class BasisNaviActivity extends AppCompatActivity implements AMapNaviListener, AMap.OnMapLoadedListener,View.OnClickListener{
 
     private Button startNaviButton;
+    public static  BasisNaviActivity context;
     /*
     定位功能对象定义
      */
@@ -115,6 +117,7 @@ public class BasisNaviActivity extends AppCompatActivity implements AMapNaviList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_basis_navi);
 
+        context=this;
         startNaviButton=(Button)findViewById(R.id.calculate_route_start_navi);
         startNaviButton.setOnClickListener(this);
         //获取相关权限

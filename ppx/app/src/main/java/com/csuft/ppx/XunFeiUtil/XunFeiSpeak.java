@@ -51,10 +51,10 @@ public class XunFeiSpeak {
 
     //外界调用的初始化函数
     public static XunFeiSpeak getIance(Context context){
-        if(xunFeiSpeak==null){
+        //if(xunFeiSpeak==null){
             xunFeiSpeak=new XunFeiSpeak(context);
 
-        }
+        //}
 
         return xunFeiSpeak;
     }

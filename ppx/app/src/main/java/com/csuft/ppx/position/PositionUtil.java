@@ -166,7 +166,7 @@ public class PositionUtil {
 
     //求两个圆c1和c2的交点,并且这个交点在c3这个圆的范围内
     private  static Point intersect(Circular c1, Circular c2, Circular c3){
-       // System.out.println("半径为"+c1.getR()+"与 半径为"+c2.getR()+"的交点");
+       System.out.println("半径为"+c1.getR()+"与 半径为"+c2.getR()+"的交点");
        // System.out.println();
         Point result=null;
         double x1=c1.getX(),y1=c1.getY(),r1=c1.getR();

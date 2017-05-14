@@ -12,6 +12,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
+import com.csuft.ppx.Navi.RouteNaviActivity;
 import com.csuft.ppx.R;
 import com.csuft.ppx.acquisition.CacheHandler;
 import com.csuft.ppx.acquisition.LeOperation;
@@ -30,6 +31,7 @@ public class ParkActivity extends BaseActivity implements OnClickListener {
 //    private TextView ppx;
     private static ImageView car;
 //    private FloatingActionButton fab;
+    private FrameLayout tccFrame;
     private ImageButton fab;
     //停车位
     private ImageView carport1;
@@ -53,6 +55,8 @@ public class ParkActivity extends BaseActivity implements OnClickListener {
     //到达的车位
     private static int carPort = 0;
     private static Method method;
+    private static List xxList = new ArrayList();
+    private static List yyList = new ArrayList();
     //移动
     //public static PathRunnable pathRunnable = new PathRunnable();
     int step = 20;
@@ -63,12 +67,17 @@ public class ParkActivity extends BaseActivity implements OnClickListener {
         public void handleMessage(Message msg) {
             switch (msg.what){
                 case 1:
-                    double x = (double)msg.arg1/100*density;
-                    double y = (double)msg.arg2/100*density;
-                    Log.v("step","~~~~~~~~~~"+x+" "+y);
-                    com.csuft.ppx.position.Point point = new com.csuft.ppx.position.Point(x,y);
-                    points.add(point);
-                    handler.postDelayed(new PathRunnable(),1);
+                    float x = (float)msg.arg1/100*density;
+                    float y = (float)msg.arg2/100*density;
+//                    if(x>=0&&y>=0) {
+//                        xxList.add(x);
+//                        yyList.add(y);
+//                        lineDraw();
+                        Log.v("step", "~~~~~~~~~~" + x + " " + y);
+                        Point point = new Point(x, y);
+                        points.add(point);
+                        handler.postDelayed(new PathRunnable(), 1);
+//                    }
                     break;
             }
         }
@@ -84,6 +93,8 @@ public class ParkActivity extends BaseActivity implements OnClickListener {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_park);
+        //关闭高德导航页面
+//        RouteNaviActivity.cancel();
         points = new ArrayList<Point>();
         initWidget();
         checkBlePermission();
@@ -217,6 +228,8 @@ public class ParkActivity extends BaseActivity implements OnClickListener {
         carportList.add(carport4);
         carportList.add(carport5);
         myView = (MyView) findViewById(R.id.myview);
+        tccFrame = (FrameLayout)findViewById(R.id.tccFrame);
+//        tccFrame.setBackground(R.drawable.tcc);
 //        selectPack = (TextView) findViewById(R.id.select_pack);
 //        selectPack.setOnClickListener(new OnClickListener() {
 //            @Override
@@ -256,28 +269,29 @@ public class ParkActivity extends BaseActivity implements OnClickListener {
 //        handler.postDelayed(runnable, delay);
     }
     public static void lineDraw(){
-        List<FindPath> findPathLists = method.getShortPath(carPort,car,density);
-        String string = "---------";
-        for(FindPath findPath:findPathLists)
-            string += " "+findPath.startPath+" to "+findPath.endPath+" "+findPath.endLocation+";";
-        Log.v("ling",string);
-        List<Place> places = method.getPlaceList();
-        List xxList = new ArrayList();
-        List yyList = new ArrayList();
-        xxList.add(car.getX());
-        yyList.add(car.getY());
-        Log.v("ling",""+findPathLists.size());
-        for(int i=findPathLists.size()-1;i>=0;i--){
-            FindPath findPath = findPathLists.get(i);
-            if(findPath.startPath!=0){
-                Place ps = places.get(findPath.startPath);
-                xxList.add(ps.x*density);
-                yyList.add(ps.y*density);
-            }
-            Place pe = places.get(findPath.endPath);
-            xxList.add(pe.x*density);
-            yyList.add(pe.y*density);
-        }
+//        List<FindPath> findPathLists = method.getShortPath(carPort,car,density);
+//        String string = "---------";
+//        for(FindPath findPath:findPathLists)
+//            string += " "+findPath.startPath+" to "+findPath.endPath+" "+findPath.endLocation+";";
+//        Log.v("ling",string);
+//        List<Place> places = method.getPlaceList();
+//
+//        xxList.add(car.getX());
+//        yyList.add(car.getY());
+//        Log.v("ling",""+findPathLists.size());
+//        for(int i=findPathLists.size()-1;i>=0;i--){
+//            FindPath findPath = findPathLists.get(i);
+//            if(findPath.startPath!=0){
+//                Place ps = places.get(findPath.startPath);
+//                xxList.add(ps.x*density);
+//                yyList.add(ps.y*density);
+//            }
+//            Place pe = places.get(findPath.endPath);
+//            xxList.add(pe.x*density);
+//            yyList.add(pe.y*density);
+////        }
+//        xxList.add(pe.x*density);
+//        yyList.add(pe.y*density);
         myView.reDraw(xxList,yyList);
     }
     int currentPath = 0;

@@ -1,22 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:background="@drawable/tcc"
-        android:layout_weight="1">
         <com.csuft.ppx.bean.MyView
             android:id="@+id/myview"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
         <FrameLayout
-            android:id="@+id/tcc"
+            android:id="@+id/tccFrame"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="top">
+            android:layout_gravity="top"
+            android:background="@drawable/tcc">
             <ImageView
                 android:id="@+id/carport1"
                 android:layout_width="wrap_content"
@@ -86,4 +83,3 @@
         </FrameLayout>
     </RelativeLayout>
 
-</LinearLayout>

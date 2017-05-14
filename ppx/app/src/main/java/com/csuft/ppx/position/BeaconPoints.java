@@ -16,14 +16,14 @@ public class BeaconPoints {
     public static Map<String,Point> beaconPointModels=new HashMap<>();
 
     static {
-        //   beaconPointModels.put("19:18:FC:03:B6:AD",new Point(2.4,12));
-      beaconPointModels.put("19:18:FC:03:B6:A0",new Point(15,0));
+       beaconPointModels.put("19:18:FC:03:B6:AD",new Point(14.5,0));
+   beaconPointModels.put("19:18:FC:03:B6:A0",new Point(14.5,12));
       //   beaconPointModels.put("19:18:FC:03:B6:AA",new Point(0,0));
-       beaconPointModels.put("19:18:FC:03:B6:AB",new Point(18,0));
-       beaconPointModels.put("19:18:FC:03:B6:C2",new Point(18,6));
-      beaconPointModels.put("19:18:FC:03:B6:BA",new Point(15,3));
-       beaconPointModels.put("19:18:FC:03:07:D2",new Point(15,9));
-      beaconPointModels.put("19:18:FC:03:07:AD",new Point(18,12));
+    beaconPointModels.put("19:18:FC:03:B6:AB",new Point(20,0));
+    beaconPointModels.put("19:18:FC:03:B6:C2",new Point(20,15));
+   beaconPointModels.put("19:18:FC:03:B6:BA",new Point(14.5,20));
+ beaconPointModels.put("19:18:FC:03:07:D2",new Point(20,8));
+    beaconPointModels.put("19:18:FC:03:07:AD",new Point(14.5,4));
         // beaconPointModels.put("19:18:FC:03:07:A4",new Point(5,5));
     }
 

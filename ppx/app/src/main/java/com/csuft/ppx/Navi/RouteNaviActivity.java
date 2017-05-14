@@ -1,12 +1,16 @@
 package com.csuft.ppx.Navi;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.view.Window;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.amap.api.navi.AMapNavi;
 import com.amap.api.navi.AMapNaviListener;
@@ -21,12 +25,14 @@ import com.amap.api.navi.model.AimLessModeCongestionInfo;
 import com.amap.api.navi.model.AimLessModeStat;
 import com.amap.api.navi.model.NaviInfo;
 import com.autonavi.tbt.TrafficFacilityInfo;
+import com.csuft.ppx.MainActivity;
 import com.csuft.ppx.R;
 import com.csuft.ppx.XunFeiUtil.TTSController;
 import com.csuft.ppx.XunFeiUtil.XunFeiSpeak;
 import com.csuft.ppx.acquisition.Cache;
 import com.csuft.ppx.acquisition.CacheHandler;
 import com.csuft.ppx.acquisition.LeOperation;
+import com.csuft.ppx.activity.ParkActivity;
 import com.iflytek.cloud.thirdparty.V;
 
 
@@ -37,6 +43,27 @@ public class RouteNaviActivity extends FragmentActivity implements AMapNaviListe
     Fragment mNaviFragemnt;
     TTSController mTtsManager;
 
+    private static  RouteNaviActivity context;
+    private  Handler handler=new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            if (((String) msg.obj).equals("enough")) {
+                //取消进度条
+               // Toast.makeText(RouteNaviActivity.this,"接受到足够的beacon",Toast.LENGTH_SHORT).show();
+                progressDialog.dismiss();
+                //跳转到室内地图
+                Intent intent=new Intent(RouteNaviActivity.this, ParkActivity.class);
+                startActivity(intent);
+            }
+        }
+    };
+
+    //关闭高德导航页面
+    public static void cancel(){
+        BasisNaviActivity.context.finish();
+        RouteNaviActivity.context.finish();
+    }
+
     //进度对话框
     private ProgressDialog progressDialog;
     @Override
@@ -45,8 +72,9 @@ public class RouteNaviActivity extends FragmentActivity implements AMapNaviListe
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_route_navi);
 
+        context=this;
         //语音初始化
-       mTtsManager = TTSController.getInstance(getApplicationContext());
+        mTtsManager = TTSController.getInstance(getApplicationContext());
         mTtsManager.init();
 
         mAMapNavi=AMapNavi.getInstance(getApplicationContext());
@@ -129,19 +157,47 @@ public class RouteNaviActivity extends FragmentActivity implements AMapNaviListe
     public void onArriveDestination() {
         //到达目的地后
         //显示进度条
+
         XunFeiSpeak.getIance(RouteNaviActivity.this).Speak("请将车缓慢开进车库");
+
         progressDialog=ProgressDialog.show(RouteNaviActivity.this,"请稍后","正在为你切换车库地图",true);
-        LeOperation.getInstance().start();//开始扫描
-        while (true) {
-            if (Cache.getInstance().isCacheEnough()) {
-                //数据充足，跳出循环
-                //取消进度条，进入地图
-                break;
-            } else {
-                continue;
+
+
+       // Intent intent=new Intent(RouteNaviActivity.this, ParkActivity.class);
+       // startActivity(intent);
+
+       new Thread(new Runnable() {
+            @Override
+            public void run() {
+                /*
+                LeOperation.getInstance().start();//开始扫描
+                while (true) {
+                   if (Cache.getInstance().isCacheEnough()) {
+                        //数据充足，跳出循环
+
+                       //取消进度条，进入地图
+                      // progressDialog.dismiss();
+                       Message msg = new Message();
+                       msg.obj = "enough";
+                       handler.sendMessage(msg);
+                        break;
+
+                    } else {
+                        continue;
+                    }
+                }*/
+                //CacheHandler.getInstance().start(1500);//开始处理数据，间隔1500ms
+                try {
+                    //线程睡两秒
+                    Thread.sleep(4000);
+                    Message msg = new Message();
+                    msg.obj = "enough";
+                    handler.sendMessage(msg);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
-        }
-        CacheHandler.getInstance().start(1500);//开始处理数据，间隔1500ms
+       }).start();
     }
 
     @Override

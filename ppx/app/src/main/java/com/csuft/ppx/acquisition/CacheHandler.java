@@ -29,9 +29,12 @@ public class CacheHandler {
     private TimerTask timerTask;
     private List<Beacon> lastPosition = new ArrayList<>();
     private int circle = 3;
-    private static Beacon closeBeacon=null;//距离最近的那个beacon，为缓存
-    private static List<Beacon> ThreeBeacon=new ArrayList<>();//从所有接受到Beacon中赛选到的3个beacon
-    private static String[] closeTwoBeaconMAC=new String[2];//最近的两个beacon的MAC
+    private static Beacon closeBeacon = null;//距离最近的那个beacon，为缓存
+    private static List<Beacon> ThreeBeacon = new ArrayList<>();//从所有接受到Beacon中赛选到的3个beacon
+    private static String[] closeTwoBeaconMAC = new String[2];//最近的两个beacon的MAC
+
+    //当前定位点
+    private static Point point=null;
 
     private CacheHandler() {
         timer = new Timer();
@@ -42,6 +45,7 @@ public class CacheHandler {
             }
         };
     }
+
     public static CacheHandler getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new CacheHandler();
@@ -71,9 +75,9 @@ public class CacheHandler {
                     list.remove(0);
                     list.remove(list.size() - 1);
                     Beacon currentBeacon = list.get(0);
-                    Log.i(TAG, "handlingData: "+currentBeacon.getMac());
+                    Log.i(TAG, "handlingData: " + currentBeacon.getMac());
                     currentBeacon.setRssi(hitCircle(list));
-                    Log.i(TAG, "handlingData: distance"+currentBeacon.getDistance());
+                    Log.i(TAG, "handlingData: distance" + currentBeacon.getDistance());
                     lastPosition.add(currentBeacon);
                 } else {
                     //数据较少，取最强的
@@ -84,56 +88,68 @@ public class CacheHandler {
             //在这里回调，返回lastPosition
             Log.i(TAG, "handlingData: ***************华丽的分割线****************");
         }
-        
+
         //对接收到beacon进行排序
         Collections.sort(lastPosition, new Comparator<Beacon>() {
             @Override
             public int compare(Beacon o1, Beacon o2) {
-                return (int) (o1.getDistance()- o2.getDistance());
+                return (int) (o1.getDistance() * 100 - o2.getDistance() * 100);
             }
         });
+
+
         //获取最近的那个beacon
-        Beacon mycloseBeacon=lastPosition.get(0);
-        //如果和上一次数据的beacon一样，就无需再计算
+        Beacon mycloseBeacon = lastPosition.get(0);
 
-        if(closeBeacon!=null&&mycloseBeacon.getMac().equals(closeBeacon.getMac())){
+        //如果和上一次数据的距离最近beacon一样，就无需再计算
+        if (closeBeacon != null && mycloseBeacon.getMac().equals(closeBeacon.getMac())) {
 
-        }else{
+        } else {
             //不一样就再次获取
-            closeBeacon=mycloseBeacon;
-            closeTwoBeaconMAC= BeaconPoints.getAroundBeacon(mycloseBeacon);
+            closeBeacon = mycloseBeacon;
+            closeTwoBeaconMAC = BeaconPoints.getAroundBeacon(mycloseBeacon);
         }
         //每次清除
         ThreeBeacon.clear();
         //把距离最近，信号最强的那个首先加入
         ThreeBeacon.add(mycloseBeacon);
         //再把其他两个也加入
-        for(int i=0;i<lastPosition.size();i++){
-            if(lastPosition.get(i).getMac().equals(closeTwoBeaconMAC[0])||lastPosition.get(i).getMac().equals(closeTwoBeaconMAC[1]))
+        for (int i = 0; i < lastPosition.size(); i++) {
+            if (lastPosition.get(i).getMac().equals(closeTwoBeaconMAC[0]) || lastPosition.get(i).getMac().equals(closeTwoBeaconMAC[1]))
                 ThreeBeacon.add(lastPosition.get(i));
         }
-        Log.i("hwm","进行计算的3个beacon为:");
-        for(Beacon b: ThreeBeacon){
-           Log.i("hwm","MAC:  "+b.getMac());
-        }
-        //根据beacon实现定位
-        if (ThreeBeacon.size()==3) {
-            try{
-                Point point = PositionUtil.getIstance().Position(ThreeBeacon);
-                Log.i(TAG, "handlingData: ***************华丽的分割线****************");
-                Log.i("hwm", "定位坐标为   (" + point.getX() + "," + point.getY() + ")");
-                Log.i(TAG, "handlingData: ***************华丽的分割线****************");
-                Message message = new Message();
-                message.what = 1;
-                message.arg1 = (int) (point.getX()*17.5*100);
-                message.arg2 = (int) (point.getY()*13.3*100);
-                ParkActivity.handler.sendMessage(message);
-            }catch (Exception e){
+
+        if (ThreeBeacon.size() == 3) {
+            //获取到最近三组，较为精确的定位
+            Log.i("hwm", "进行计算的3个beacon为:");
+            for (Beacon b : ThreeBeacon) {
+                Log.i("hwm", "MAC:  " + b.getMac());
+            }
+            //根据beacon实现定位
+
+            try {
+
+                point = PositionUtil.getIstance().Position(ThreeBeacon);
+
+            } catch (Exception e) {
                 Log.i(TAG, "handlingData: 此次定位失败，重新定位");
             }
+
+        } else {
+            //根据距离最近的三个beacon定位，经度有所欠缺
+            Log.i("hwm", "根据距离最近的三个beacon定位");
+            point = PositionUtil.getIstance().Position(lastPosition.subList(0,3));
+
         }
-        else
-            Log.i(TAG, "handlingData: 此次定位失败，重新定位");
+        Log.i(TAG, "handlingData: ***************华丽的分割线****************");
+        Log.i("hwm", "定位坐标为   (" + point.getX() + "," + point.getY() + ")");
+        Log.i(TAG, "handlingData: ***************华丽的分割线****************");
+
+       Message message = new Message();
+        message.what = 1;
+        message.arg1 = (int) (point.getX() * 17.5 * 100);
+       message.arg2 = (int) (point.getY() * 13.3 * 100);
+        ParkActivity.handler.sendMessage(message);
 
     }
 
@@ -174,7 +190,7 @@ public class CacheHandler {
                 }
             }
         }
-        Log.i(TAG, "hitCircle: "+hit);
+        Log.i(TAG, "hitCircle: " + hit);
         return hit;
     }
 

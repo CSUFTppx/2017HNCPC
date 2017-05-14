@@ -51,7 +51,7 @@ public class MyView extends View {
         super.onDraw(canvas);
 
         if(xlist != null && xlist.size()>1 && ylist != null && ylist.size()>1){
-            for(int i=0;i<xlist.size()&&i+1<xlist.size();i+=2){
+            for(int i=0;i<xlist.size()&&i+1<xlist.size();i+=1){
                 canvas.drawLine(xlist.get(i),ylist.get(i),xlist.get(i+1),ylist.get(i+1),mPaint);
             }
         }

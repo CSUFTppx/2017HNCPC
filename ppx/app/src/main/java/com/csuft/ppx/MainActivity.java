@@ -13,16 +13,19 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import com.csuft.ppx.XunFeiUtil.XunFeiSpeak;
 import com.csuft.ppx.acquisition.CacheHandler;
 import com.csuft.ppx.acquisition.LeOperation;
+import com.csuft.ppx.activity.BaseActivity;
 import com.csuft.ppx.application.ApplicationData;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity{
 
     private static boolean BLE_PERMISSION = false;
     private static final int MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION = 1;
     private Button button;
 
+    private Button XunFeiButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,24 +40,18 @@ public class MainActivity extends AppCompatActivity {
                 CacheHandler.getInstance().start(1500);
             }
         });
+        XunFeiButton=(Button)findViewById(R.id.button1);
+        XunFeiButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                XunFeiSpeak.getIance(MainActivity.this).Speak("黄伟民是个大傻逼");
+            }
+        });
         checkBlePermission();
 
     }
 
-    private void checkBlePermission() {
-        if (Build.VERSION.SDK_INT >= 23) {
-            //校验是否已具有模糊定位权限
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                BLE_PERMISSION = false;
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
-                        MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION);
-            } else {
-                //具有权限
-                BLE_PERMISSION = true;
-            }
-        }
-    }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
