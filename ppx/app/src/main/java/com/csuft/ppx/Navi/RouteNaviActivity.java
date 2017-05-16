@@ -60,7 +60,7 @@ public class RouteNaviActivity extends FragmentActivity implements AMapNaviListe
 
     //关闭高德导航页面
     public static void cancel(){
-        BasisNaviActivity.context.finish();
+        //BasisNaviActivity.context.finish();
         RouteNaviActivity.context.finish();
     }
 
