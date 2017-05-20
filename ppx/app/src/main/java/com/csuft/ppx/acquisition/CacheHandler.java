@@ -5,7 +5,9 @@ import android.util.Log;
 
 import com.csuft.ppx.activity.ParkActivity;
 import com.csuft.ppx.position.BeaconPoints;
+import com.csuft.ppx.position.MoveUtils;
 import com.csuft.ppx.position.Point;
+
 import com.csuft.ppx.position.PositionUtil;
 
 import java.util.ArrayList;
@@ -35,6 +37,12 @@ public class CacheHandler {
 
     //当前定位点
     private static Point point=null;
+    //上一个定位点
+    private static Point lastPoint=null;
+    //运动方向
+    private int moveDirection;
+    //当前用于计算的3个beacon的坐标点集合
+    private static List<Point> points=new ArrayList<>();
 
     private CacheHandler() {
         timer = new Timer();
@@ -89,6 +97,8 @@ public class CacheHandler {
             Log.i(TAG, "handlingData: ***************华丽的分割线****************");
         }
 
+        //hwm................
+
         //对接收到beacon进行排序
         Collections.sort(lastPosition, new Comparator<Beacon>() {
             @Override
@@ -108,6 +118,11 @@ public class CacheHandler {
             //不一样就再次获取
             closeBeacon = mycloseBeacon;
             closeTwoBeaconMAC = BeaconPoints.getAroundBeacon(mycloseBeacon);
+            //获取这3个beacond的坐标点
+            points.clear();
+            points.add(BeaconPoints.beaconPointModels.get(mycloseBeacon.getMac()));
+            points.add(BeaconPoints.beaconPointModels.get(closeTwoBeaconMAC[0]));
+            points.add(BeaconPoints.beaconPointModels.get(closeTwoBeaconMAC[1]));
         }
         //每次清除
         ThreeBeacon.clear();
@@ -126,31 +141,62 @@ public class CacheHandler {
                 Log.i("hwm", "MAC:  " + b.getMac());
             }
             //根据beacon实现定位
-
             try {
-
+                //获取计算的坐标点
                 point = PositionUtil.getIstance().Position(ThreeBeacon);
+                //处理坐标点
+
+                //获取这3个beacond的坐标点
+               // points=BeaconPoints.getPointFromBeacon(ThreeBeacon);
+                //判断是不是在三角形内
+                if(MoveUtils.isInTriangle(points,point)){
+                   //在三角形内
+
+                    Log.i(TAG, "handlingData: 在三角形内");
+                    //获取他们的运动发向
+                    moveDirection=MoveUtils.moveDirection(points.get(0),points.get(1),points.get(2));
+                    if(moveDirection==1){
+                        point.setX(MoveUtils.mid(points,moveDirection));//直行处理X
+                    }else if(moveDirection==-1)
+                        point.setY(MoveUtils.mid(points,moveDirection));//横行处理Y
+                    //启动缓存
+                    lastPoint=point;
+                }else{
+                    //不在三角形内,采用上一个定位点
+                    Log.i(TAG, "handlingData: 不在三角形内，采用上一个点的缓存");
+                    point=lastPoint;
+                }
 
             } catch (Exception e) {
                 Log.i(TAG, "handlingData: 此次定位失败，重新定位");
             }
 
         } else {
-            //根据距离最近的三个beacon定位，经度有所欠缺
-            Log.i("hwm", "根据距离最近的三个beacon定位");
+            //根据距离最近的三个beacon定位，精度有所欠缺
+            Log.i("hwm", "精度欠缺定位。。。。。距离最近的三个beacon定位");
             point = PositionUtil.getIstance().Position(lastPosition.subList(0,3));
-
+            //
+            if(moveDirection==1){
+                point.setX(lastPoint.getX());
+            }else  if(moveDirection==-1){
+                point.setY(lastPoint.getY());
+            }
         }
         Log.i(TAG, "handlingData: ***************华丽的分割线****************");
         Log.i("hwm", "定位坐标为   (" + point.getX() + "," + point.getY() + ")");
         Log.i(TAG, "handlingData: ***************华丽的分割线****************");
 
-       Message message = new Message();
+        /*
+        Message message = new Message();
         message.what = 1;
         message.arg1 = (int) (point.getX() * 17.5 * 100);
-       message.arg2 = (int) (point.getY() * 13.3 * 100);
+        message.arg2 = (int) (point.getY() * 13.3 * 100);
         ParkActivity.handler.sendMessage(message);
-
+        */
+        //检测不合理的数据
+        if(Double.isNaN(point.getX())||Double.isNaN(point.getY())||point.getX()<0||point.getY()<0){
+            Log.i(TAG, "handlingData: 定位出错，数字出现NAN或者出现负数");
+        }
     }
 
     private int hitCircle(List<Beacon> beaconList) {

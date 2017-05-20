@@ -44,9 +44,9 @@
             android:value="577403235e7a1055db0b0c44ac32bb88" />
 
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".activity.HomeActivity">
         </activity>
-        <activity android:name=".activity.HomeActivity"
+        <activity android:name=".MainActivity"
             android:label="皮皮虾停车场"
             android:screenOrientation="portrait">
             <intent-filter>

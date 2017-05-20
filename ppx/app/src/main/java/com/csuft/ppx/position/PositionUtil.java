@@ -151,12 +151,14 @@ public class PositionUtil {
         double ps2=circulars.get(1).getR()/sum;
         double ps3=circulars.get(2).getR()/sum;
 
-        //设置返回的结果坐标点
+        //设置返回的结果坐标点；
         result.setX((p1.getX()*ps1+p2.getX()*ps2+p3.getX()*ps3)/3);
         result.setY((p1.getY()*ps1+p2.getY()*ps2+p3.getY()*ps3)/3);
         if(result.getX()<0||result.getY()<0)
             System.out.print("位置定位失败！重新定位");
             */
+
+
         result.setX((p1.getX()+p2.getX()+p3.getX())/3);
         result.setY((p1.getY()+p2.getY()+p3.getY())/3);
         return result;
