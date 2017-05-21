@@ -110,6 +110,7 @@ public class CacheHandler {
         });
 
 
+        try {
         //获取最近的那个beacon
         Beacon mycloseBeacon = lastPosition.get(0);
 
@@ -119,7 +120,7 @@ public class CacheHandler {
         } else {
             //不一样就再次获取
             closeBeacon = mycloseBeacon;
-            
+
             closeTwoBeaconMAC = BeaconPoints.getAroundBeacon(mycloseBeacon);
             //获取这3个beacond的坐标点
 
@@ -141,7 +142,7 @@ public class CacheHandler {
                 ThreeBeacon.add(lastPosition.get(i));
         }
 
-    try {
+
         if (ThreeBeacon.size() == 3) {
             //获取到最近三组，较为精确的定位
 
@@ -209,6 +210,7 @@ public class CacheHandler {
             }
         }
     }catch (Exception e){
+            Log.i(TAG, "handlingData: 异常处理采用缓存");
         if(lastPoint!=null)
             point=lastPoint;
         else
