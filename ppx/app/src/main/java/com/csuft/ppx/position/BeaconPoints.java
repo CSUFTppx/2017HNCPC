@@ -19,14 +19,14 @@ public class BeaconPoints {
     private static List<Point> points=new ArrayList<>();
 
     static {
-        beaconPointModels.put("19:18:FC:03:B6:AD",new Point(0,8));
+        beaconPointModels.put("19:18:FC:03:B6:AD",new Point(0,0));
         //beaconPointModels.put("19:18:FC:03:B6:A0",new Point(0,0));
        // beaconPointModels.put("19:18:FC:03:B6:AA",new Point(0,0));
         //beaconPointModels.put("19:18:FC:03:B6:AB",new Point(0,16));
-        beaconPointModels.put("19:18:FC:03:B6:C2",new Point(2.3,4));
-        beaconPointModels.put("19:18:FC:03:B6:BA",new Point(0,0));
-       beaconPointModels.put("19:18:FC:03:07:D2",new Point(0,16));
-       beaconPointModels.put("19:18:FC:03:07:AD",new Point(2.3,12));
+        beaconPointModels.put("19:18:FC:03:B6:C2",new Point(0,16));
+        beaconPointModels.put("19:18:FC:03:B6:BA",new Point(2.3,12));
+       beaconPointModels.put("19:18:FC:03:07:D2",new Point(0,8));
+       beaconPointModels.put("19:18:FC:03:07:AD",new Point(2.3,4));
         // beaconPointModels.put("19:18:FC:03:07:A4",new Point(5,5));
     }
 

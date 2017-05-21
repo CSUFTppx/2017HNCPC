@@ -26,12 +26,15 @@ public class MainActivity extends BaseActivity{
     private Button button;
 
     private Button XunFeiButton;
+
+    private  Button stopLocation;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ApplicationData.setMainActivity(MainActivity.this);
 
+        //开启定位
         button = (Button) findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -40,6 +43,7 @@ public class MainActivity extends BaseActivity{
                 CacheHandler.getInstance().start(1500);
             }
         });
+        //测试讯飞语音
         XunFeiButton=(Button)findViewById(R.id.button1);
         XunFeiButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -47,6 +51,17 @@ public class MainActivity extends BaseActivity{
                 XunFeiSpeak.getIance(MainActivity.this).Speak("黄伟民是个大傻逼");
             }
         });
+        //停止定位
+        stopLocation=(Button)findViewById(R.id.stopLocation);
+        stopLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //停止定位
+                LeOperation.getInstance().stop();
+                CacheHandler.getInstance().stop();
+            }
+        });
+
         checkBlePermission();
 
     }

@@ -33,6 +33,7 @@ public class CacheHandler {
     private int circle = 3;
     private static Beacon closeBeacon = null;//距离最近的那个beacon，为缓存
     private static List<Beacon> ThreeBeacon = new ArrayList<>();//从所有接受到Beacon中赛选到的3个beacon
+
     private static String[] closeTwoBeaconMAC = new String[2];//最近的两个beacon的MAC
 
     //当前定位点
@@ -97,6 +98,7 @@ public class CacheHandler {
             Log.i(TAG, "handlingData: ***************华丽的分割线****************");
         }
 
+
         //hwm................
 
         //对接收到beacon进行排序
@@ -117,25 +119,32 @@ public class CacheHandler {
         } else {
             //不一样就再次获取
             closeBeacon = mycloseBeacon;
+            
             closeTwoBeaconMAC = BeaconPoints.getAroundBeacon(mycloseBeacon);
             //获取这3个beacond的坐标点
+
             points.clear();
             points.add(BeaconPoints.beaconPointModels.get(mycloseBeacon.getMac()));
             points.add(BeaconPoints.beaconPointModels.get(closeTwoBeaconMAC[0]));
             points.add(BeaconPoints.beaconPointModels.get(closeTwoBeaconMAC[1]));
+
         }
+
         //每次清除
         ThreeBeacon.clear();
         //把距离最近，信号最强的那个首先加入
         ThreeBeacon.add(mycloseBeacon);
+
         //再把其他两个也加入
         for (int i = 0; i < lastPosition.size(); i++) {
             if (lastPosition.get(i).getMac().equals(closeTwoBeaconMAC[0]) || lastPosition.get(i).getMac().equals(closeTwoBeaconMAC[1]))
                 ThreeBeacon.add(lastPosition.get(i));
         }
 
+    try {
         if (ThreeBeacon.size() == 3) {
             //获取到最近三组，较为精确的定位
+
             Log.i("hwm", "进行计算的3个beacon为:");
             for (Beacon b : ThreeBeacon) {
                 Log.i("hwm", "MAC:  " + b.getMac());
@@ -147,24 +156,41 @@ public class CacheHandler {
                 //处理坐标点
 
                 //获取这3个beacond的坐标点
-               // points=BeaconPoints.getPointFromBeacon(ThreeBeacon);
+                // points=BeaconPoints.getPointFromBeacon(ThreeBeacon);
+
+                //获取他们的运动发向
+                moveDirection = MoveUtils.moveDirection(points.get(0), points.get(1), points.get(2));
+
                 //判断是不是在三角形内
-                if(MoveUtils.isInTriangle(points,point)){
-                   //在三角形内
+                if (MoveUtils.isInTriangle(points, point)) {
+                    //在三角形内
 
                     Log.i(TAG, "handlingData: 在三角形内");
-                    //获取他们的运动发向
-                    moveDirection=MoveUtils.moveDirection(points.get(0),points.get(1),points.get(2));
-                    if(moveDirection==1){
-                        point.setX(MoveUtils.mid(points,moveDirection));//直行处理X
-                    }else if(moveDirection==-1)
-                        point.setY(MoveUtils.mid(points,moveDirection));//横行处理Y
+
+
+                    if (moveDirection == 1)
+                        point.setX(MoveUtils.mid(points, moveDirection));//直行处理X
+                    else if (moveDirection == -1)
+                        point.setY(MoveUtils.mid(points, moveDirection));//横行处理Y
                     //启动缓存
-                    lastPoint=point;
-                }else{
-                    //不在三角形内,采用上一个定位点
-                    Log.i(TAG, "handlingData: 不在三角形内，采用上一个点的缓存");
-                    point=lastPoint;
+                    lastPoint = point;
+
+                } else {
+                    //不在三角形内,采用另一种方式来定位
+                    Log.i(TAG, "handlingData: 不在三角形内，采用另一种方式来定位");
+                    point = PositionUtil.getIstance().Position(lastPosition.subList(0, 3));
+                    //判断是不是在三角形内
+                    if (MoveUtils.isInTriangle(points, point)) {
+                        if (moveDirection == 1) {
+                            point.setX(MoveUtils.mid(points, moveDirection));//直行处理X
+                        } else if (moveDirection == -1)
+                            point.setY(MoveUtils.mid(points, moveDirection));//横行处理Y
+                        lastPoint = point;
+                    } else {
+                        Log.i(TAG, "handlingData: 启动缓存点");
+                        point = lastPoint;
+                    }
+
                 }
 
             } catch (Exception e) {
@@ -174,30 +200,39 @@ public class CacheHandler {
         } else {
             //根据距离最近的三个beacon定位，精度有所欠缺
             Log.i("hwm", "精度欠缺定位。。。。。距离最近的三个beacon定位");
-            point = PositionUtil.getIstance().Position(lastPosition.subList(0,3));
+            point = PositionUtil.getIstance().Position(lastPosition.subList(0, 3));
             //
-            if(moveDirection==1){
+            if (moveDirection == 1 && lastPoint != null) {
                 point.setX(lastPoint.getX());
-            }else  if(moveDirection==-1){
+            } else if (moveDirection == -1 && lastPoint != null) {
                 point.setY(lastPoint.getY());
             }
         }
-        Log.i(TAG, "handlingData: ***************华丽的分割线****************");
-        Log.i("hwm", "定位坐标为   (" + point.getX() + "," + point.getY() + ")");
-        Log.i(TAG, "handlingData: ***************华丽的分割线****************");
+    }catch (Exception e){
+        if(lastPoint!=null)
+            point=lastPoint;
+        else
+            Log.i(TAG, "handlingData: 定位终极失败。。。。。。我也没办法了");
+    }
 
-        /*
+
+        //检测不合理的数据
+        if(point==null||Double.isNaN(point.getX())||Double.isNaN(point.getY())||point.getX()<0||point.getY()<0){
+            Log.i(TAG, "handlingData: 定位出错，数字出现NAN或者出现负数,或者出现错误");
+        }else{
+            Log.i(TAG, "handlingData: ***************华丽的分割线****************");
+            Log.i("hwm", "定位坐标为   (" + point.getX() + "," + point.getY() + ")");
+            Log.i(TAG, "handlingData: ***************华丽的分割线****************");
+             /*
         Message message = new Message();
         message.what = 1;
         message.arg1 = (int) (point.getX() * 17.5 * 100);
         message.arg2 = (int) (point.getY() * 13.3 * 100);
         ParkActivity.handler.sendMessage(message);
         */
-        //检测不合理的数据
-        if(Double.isNaN(point.getX())||Double.isNaN(point.getY())||point.getX()<0||point.getY()<0){
-            Log.i(TAG, "handlingData: 定位出错，数字出现NAN或者出现负数");
         }
     }
+
 
     private int hitCircle(List<Beacon> beaconList) {
         int Max = 0;
